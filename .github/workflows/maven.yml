@@ -34,8 +34,10 @@ jobs:
       run: mvn test
     - name: Test success
       if: ${{success()}}
-      run: |
-        echo "Test cases are executed"
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: 'https://dummy.restapiexample.com/api/v1/employees'
+        method: 'GET'
         
     - name: Test failure
       if: ${{failure()}}
