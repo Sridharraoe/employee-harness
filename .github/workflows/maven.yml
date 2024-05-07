@@ -34,10 +34,8 @@ jobs:
       run: mvn test
     - name: Test success
       if: ${{success()}}
-      uses: fjogeleit/http-request-action@v1
-      with:
-        url: 'http://127.0.0.1:9092/employees/workflow?status=success'
-        method: 'GET'
+      run: |
+        echo "Test cases are executed"
         
     - name: Test failure
       if: ${{failure()}}
