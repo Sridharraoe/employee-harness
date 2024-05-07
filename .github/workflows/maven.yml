@@ -36,7 +36,7 @@ jobs:
       if: ${{success()}}
       uses: fjogeleit/http-request-action@v1
       with:
-        url: 'https://dummy.restapiexample.com/api/v1/employees'
+        url: 'http://192.168.220.42:9092/employees/workflow?status=success'
         method: 'GET'
         
     - name: Test failure
