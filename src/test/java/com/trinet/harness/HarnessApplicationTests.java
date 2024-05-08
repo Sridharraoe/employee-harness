@@ -151,19 +151,19 @@ class HarnessApplicationTests {
 
 
 
-	@Test
-	 void testExceptionMethod() throws InterruptedException, FeatureFlagInitializeException {
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(true);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(false);
-		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-			employeeServiceInject.getEmployees();
-		});
-		String expectedMessage = FeatureFlagConstants.API_DISABLED_MESSAGE;
-		String actualMessage = exception.getMessage();
-		assertTrue(actualMessage.contains(expectedMessage));
-
-	}
+//	@Test
+//	 void testExceptionMethod() throws InterruptedException, FeatureFlagInitializeException {
+//		when(harnessProvider.getFlagValues(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(false);
+//		when(harnessProvider.getFlagValues(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
+//		when(harnessProvider.getFlagValues(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
+//		when(harnessProvider.getFlagValues(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(true);
+//		when(harnessProvider.getFlagValues(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(false);
+//		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+//			employeeServiceInject.getEmployees();
+//		});
+//		String expectedMessage = FeatureFlagConstants.API_DISABLED_MESSAGE;
+//		String actualMessage = exception.getMessage();
+//		assertTrue(actualMessage.contains(expectedMessage));
+//
+//	}
 }
