@@ -39,7 +39,13 @@ public class GitHubActionsService {
 		headers.set("X-GitHub-Api-Version", "2022-11-28");
 
 		HttpEntity<String> entity = new HttpEntity<String>(requestJson, headers);
-		ResponseEntity<String> response = restTemplate.postForEntity(workflowUrl, entity, String.class);
+		log.info("Calling the dispatcher event ");
+		try{
+			ResponseEntity<String> response = restTemplate.postForEntity(workflowUrl, entity, String.class);
+		}catch(Exception e){
+			log.info("Exception occured "+ e);
+		}
+		log.info("completed calling the dispatcher event ");
 		HttpStatusCode status = response.getStatusCode();
 		log.info("Response Status " + status);
 		log.info("triggerGitHubActionWorkflow() -- End");
