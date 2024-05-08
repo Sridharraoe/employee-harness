@@ -35,6 +35,7 @@ public class GitHubActionsService {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("Accept", "application/vnd.github+json");
 		headers.set("User-Agent", "BE application");
+		log.info("token "+token);
 		headers.set("Authorization", "Bearer "+token);
 		headers.set("X-GitHub-Api-Version", "2022-11-28");
 
