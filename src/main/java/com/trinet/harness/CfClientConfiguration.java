@@ -31,9 +31,18 @@ import io.harness.cf.client.api.FeatureFlagInitializeException;
 import io.harness.cf.client.connector.HarnessConfig;
 import io.harness.cf.client.connector.HarnessConnector;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Configuration
 public class CfClientConfiguration {
@@ -66,6 +75,7 @@ public class CfClientConfiguration {
 		cfClient = new CfClient(new HarnessConnector(apiKey, connectorConfig), options);
 		// CfClient cfClient = new CfClient(apiKey);
 		cfClient.waitForInitialization();
+		
 		cfClient.on(Event.READY, result -> logger.info("Harness client initialized."));
 		cfClient.on(Event.CHANGED, this::getSSEvents);
 		// Cache Data
@@ -89,12 +99,13 @@ public class CfClientConfiguration {
 
 	private void getSSEvents(String flag) {
 		logger.info("--->Triggering github actions workflow<---");
+		
 		gitHubActionsService.triggerGitHubActionWorkflow();
 	}
 
 	public void getFFValues() throws JsonProcessingException {
 		// fetch all feature flag values
-		String featureFlagString = HarnessUtils.getFeatureFlagValues();
+		String featureFlagString =getFeatureFlagValues();
 		JsonParser parser = new JsonParser();
 		// Creating JSONObject from String using parser
 		JsonObject featureFlagJson = parser.parse(featureFlagString).getAsJsonObject();
@@ -116,4 +127,42 @@ public class CfClientConfiguration {
 		logger.info("---->CACHE UPDATED<-----");
 		cacheDataRepository.save(cacheData);
 	}
+	
+	private  String getFeatureFlagValues() {
+        var httpClient = HttpClient.newBuilder().build();
+
+        logger.info("Updating redis from HarnessUtils");
+        HashMap<String, String> params = new HashMap<>();
+        params.put("accountIdentifier", FeatureFlagConstants.ACCOUNT_IDENTIFIER);
+        params.put("orgIdentifier", FeatureFlagConstants.ORG_IDENTIFIER);
+        params.put("projectIdentifier", FeatureFlagConstants.PROJECT_IDENTIFIER);
+        params.put("environmentIdentifier", FeatureFlagConstants.ENVIRONMENT_IDENTIFIER);
+
+
+        var query = params.keySet().stream()
+          .map(key -> key + "=" + URLEncoder.encode(params.get(key), StandardCharsets.UTF_8))
+          .collect(Collectors.joining("&"));
+
+        var host = "https://app.harness.io";
+        var pathname = "/cf/admin/features";
+        var request = HttpRequest.newBuilder()
+          .GET()
+          .uri(URI.create(host + pathname + '?' + query))
+          .header("x-api-key", FeatureFlagConstants.DEV_X_API_KEY)
+          .build();
+
+        HttpResponse<String> response;
+		try {
+			response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "Exception Occurred".concat(e.getMessage());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return "Exception Occurred".concat(e.getMessage());
+		}
+
+        return response.body();
+      }
+
 }

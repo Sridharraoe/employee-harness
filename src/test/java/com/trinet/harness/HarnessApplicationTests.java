@@ -1,8 +1,6 @@
 package com.trinet.harness;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -19,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.trinet.harness.domain.Employee;
 import com.trinet.harness.domain.FFRedisDto;
-import com.trinet.harness.repo.CacheDataRepo;
 import com.trinet.harness.service.EmployeeService;
 import com.trinet.harness.service.FeatureFlagsService;
 import com.trinet.harness.utils.EmployeeUtils;
@@ -82,11 +79,11 @@ class HarnessApplicationTests {
 
 	@Test
 	void displayEmployee() throws InterruptedException, FeatureFlagInitializeException {
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(true);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(true);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
 		List<Employee> empList = employeeServiceInject.getEmployees();
 		int size = empList.size();
 		int actualSize = employeeList.size();
@@ -96,12 +93,12 @@ class HarnessApplicationTests {
 
 	@Test
 	void displayEmployeeAPIEnabledFlagTest() throws InterruptedException, FeatureFlagInitializeException {
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(true);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(true);
 
 		int size = employeeServiceInject.getEmployees().size();
 		int actualSize = EmployeeUtils.employeeList.size();
@@ -112,11 +109,11 @@ class HarnessApplicationTests {
 
 	@Test
 	void displayITDepartmentTest() throws InterruptedException, FeatureFlagInitializeException {
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(true);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
 		List<Employee> empList = employeeServiceInject.getEmployees();
 		int size = empList.size();
 		int actualSize = employeeList.stream().filter(e -> e.getDepartment().equals(FeatureFlagConstants.IT_DEPARTMENT))
@@ -127,11 +124,11 @@ class HarnessApplicationTests {
 
 	@Test
 	void displayHRDepartmentTest() throws InterruptedException, FeatureFlagInitializeException {
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(true);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
 		List<Employee> empList = employeeServiceInject.getEmployees();
 		int size = empList.size();
 		int actualSize = employeeList.stream().filter(e -> e.getDepartment().equals(FeatureFlagConstants.HR_DEPARTMENT))
@@ -142,11 +139,11 @@ class HarnessApplicationTests {
 
 	@Test
 	void displaySalesDepartmentTest() throws InterruptedException, FeatureFlagInitializeException {
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(true);
-		when(harnessProvider.getFlagValues(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.IT_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.ALL_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.HR_DEPARTMENT_FLAG)).thenReturn(false);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(true);
+		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
 		List<Employee> empList = employeeServiceInject.getEmployees();
 		FFRedisDto ffRedDist = new FFRedisDto();
 		FFRedisDto testFailure = new FFRedisDto();
