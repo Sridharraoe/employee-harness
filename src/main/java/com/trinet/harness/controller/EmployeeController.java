@@ -23,10 +23,10 @@ import com.trinet.harness.service.EmployeeService;
 public class EmployeeController {
 
 	Logger logger = LoggerFactory.getLogger(EmployeeController.class);
-	
+
 	@Autowired
 	EmployeeService employeeService;
-	
+
 	@Autowired
 	CfClientConfiguration cfClientConfiguration;
 
@@ -58,21 +58,18 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/employees/workflow")
-	public ResponseEntity<String> addEmployee(@RequestParam("status") String status) {
+	public ResponseEntity<String> getWorkflowStatus(@RequestParam("status") String status) {
 		logger.info("GITHUB ACTIONS WORKFLOW RESPONSE STATUS " + status);
 
-		if (!status.equals("success")) {
-			// call the servcie and update cache
-			try {
-				cfClientConfiguration.getFFValues();
-			
-			} catch (JsonProcessingException e) {
-	            throw new RuntimeException(e);
-	        }
+		try {
+			logger.info("====updating redis from getWorkflowStatus");
+			cfClientConfiguration.getFFValues();
+
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
 		}
 
 		return ResponseEntity.ok("Triggered");
 	}
-
 
 }

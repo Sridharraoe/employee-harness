@@ -39,7 +39,7 @@ import java.util.Optional;
 public class CfClientConfiguration {
 	Logger logger = LoggerFactory.getLogger(CfClientConfiguration.class);
 	private final CacheDataRepo cacheDataRepository;
-	
+
 	@Autowired
 	GitHubActionsService gitHubActionsService;
 
@@ -47,14 +47,13 @@ public class CfClientConfiguration {
 	private String apiKey = FeatureFlagConstants.API_KEY;
 	CfClient cfClient;
 
-    public CfClientConfiguration(CacheDataRepo cacheDataRepository, ObjectMapper objectMapper) {
-        this.cacheDataRepository = cacheDataRepository;
-        this.objectMapper = objectMapper;
-    }
+	public CfClientConfiguration(CacheDataRepo cacheDataRepository, ObjectMapper objectMapper) {
+		this.cacheDataRepository = cacheDataRepository;
+		this.objectMapper = objectMapper;
+	}
 
-
-    @SneakyThrows
-    @Bean
+	@SneakyThrows
+	@Bean
 	CfClient cfClient() throws FeatureFlagInitializeException, InterruptedException, JsonProcessingException {
 
 		HarnessConfig connectorConfig = HarnessConfig.builder().configUrl("https://config.ff.harness.io/api/1.0")
@@ -71,8 +70,10 @@ public class CfClientConfiguration {
 		cfClient.on(Event.CHANGED, this::getSSEvents);
 		// Cache Data
 		Optional<FeatureFlagDto> optionalCacheData = cacheDataRepository.findById("allFlags");
-		if (optionalCacheData.isEmpty())
+		if (optionalCacheData.isEmpty()) {
+			logger.info("===== updating redis from app start");
 			this.getFFValues();
+		}
 		return cfClient;
 	}
 
@@ -86,14 +87,12 @@ public class CfClientConfiguration {
 		};
 	}
 
-	private void getSSEvents(String flag)  {
+	private void getSSEvents(String flag) {
 		logger.info("--->Triggering github actions workflow<---");
 		gitHubActionsService.triggerGitHubActionWorkflow();
 	}
 
-
 	public void getFFValues() throws JsonProcessingException {
-	logger.info("====== updating redis cache ");
 		// fetch all feature flag values
 		String featureFlagString = HarnessUtils.getFeatureFlagValues();
 		JsonParser parser = new JsonParser();
@@ -104,7 +103,7 @@ public class CfClientConfiguration {
 		// stale , status , name , identifier ,kind , project , env
 		List<FFRedisDto> ffList = new ArrayList<>();
 		FFRedisDto flag = new FFRedisDto();
-		for(JsonElement element: featureFlags) {
+		for (JsonElement element : featureFlags) {
 			flag.setIdentifier(element.getAsJsonObject().get("identifier").getAsString());
 			flag.setState(element.getAsJsonObject().get("envProperties").getAsJsonObject().get("state").getAsString());
 			flag.setName(element.getAsJsonObject().get("name").getAsString());
