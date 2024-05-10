@@ -10,13 +10,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.trinet.harness.CfClientConfiguration;
 
 @Component
 public class HarnessUtils {
+	
+	private static final Logger logger = LoggerFactory.getLogger(HarnessUtils.class);
+
 	 public static  String getFeatureFlagValues() {
 	        var httpClient = HttpClient.newBuilder().build();
 
+	        logger.info("Updating redis from HarnessUtils");
 	        HashMap<String, String> params = new HashMap<>();
 	        params.put("accountIdentifier", FeatureFlagConstants.ACCOUNT_IDENTIFIER);
 	        params.put("orgIdentifier", FeatureFlagConstants.ORG_IDENTIFIER);
