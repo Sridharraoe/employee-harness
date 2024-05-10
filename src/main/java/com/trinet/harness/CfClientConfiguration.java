@@ -113,7 +113,7 @@ public class CfClientConfiguration {
 
 		String flagsAsJsonString = objectMapper.writeValueAsString(ffList);
 		FeatureFlagDto cacheData = new FeatureFlagDto("allFlags", flagsAsJsonString);
-
+		logger.info("---->CACHE UPDATED<-----");
 		cacheDataRepository.save(cacheData);
 	}
 }

@@ -59,7 +59,7 @@ public class EmployeeController {
 
 	@GetMapping("/employees/workflow")
 	public ResponseEntity<String> addEmployee(@RequestParam("status") String status) {
-		logger.info("GitHub Actions workflow response status " + status);
+		logger.info("GITHUB ACTIONS WORKFLOW RESPONSE STATUS " + status);
 
 		if (!status.equals("success")) {
 			// call the servcie and update cache
