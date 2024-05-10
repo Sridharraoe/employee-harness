@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -28,6 +30,8 @@ import io.micrometer.common.util.StringUtils;
 
 @SpringBootTest
 class HarnessApplicationTests {
+	Logger logger = LoggerFactory.getLogger(CfClientConfiguration.class);
+
 	static Employee newEmployee;
 
 	static List<Employee> employeeList;
@@ -145,13 +149,13 @@ class HarnessApplicationTests {
 		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(true);
 		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
 		List<Employee> empList = employeeServiceInject.getEmployees();
-		boolean ffRedDist = false;
-		boolean testFailure = false;
-		ffRedDist = hrnProvider.getFlagValues("test-variation");
-		testFailure = hrnProvider.getFlagValues("testFlag02");
-
+		boolean ffRedDist = hrnProvider.getFlagValues("test-variation");
+		boolean testFailure = hrnProvider.getFlagValues("testFlag02");
+		logger.info("test-variation "+ffRedDist);
+		logger.info("testFlag02 "+testFailure);
 		int size = empList.size();
 		if (ffRedDist && !testFailure) {
+			logger.info("tTest failes");
 			size = empList.size() + 1;
 		}
 

@@ -26,7 +26,7 @@ public class HarnessProvider {
 		    .attribute(FeatureFlagConstants.LOCATION, FeatureFlagConstants.LOCATION_VALUE)
 		    .build();
         
-		return cfClient.boolVariation(flagName, target, false);
+		return cfClient.boolVariation(flagName, null, false);
     }
     
     public boolean getFlagValuesFromCache(String flagName) {
