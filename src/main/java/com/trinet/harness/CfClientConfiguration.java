@@ -93,6 +93,7 @@ public class CfClientConfiguration {
 
 
 	public void getFFValues() throws JsonProcessingException {
+	logger.info("====== updating redis cache ");
 		// fetch all feature flag values
 		String featureFlagString = HarnessUtils.getFeatureFlagValues();
 		JsonParser parser = new JsonParser();

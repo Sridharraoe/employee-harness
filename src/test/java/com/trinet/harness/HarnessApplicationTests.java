@@ -149,14 +149,16 @@ class HarnessApplicationTests {
 		when(harnessProvider.getFlagValues(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
 		List<Employee> empList = employeeServiceInject.getEmployees();
 		FFRedisDto ffRedDist = new FFRedisDto();
+		FFRedisDto testFailure = new FFRedisDto();
 		try {
 			ffRedDist = featureFlagsService.getFlagById("test-variation");
+			testFailure = featureFlagsService.getFlagById("testFlag02");
 		} catch (JsonProcessingException e) {
 
 		}
 		int size = empList.size();
 		if(ffRedDist!= null && StringUtils.isNotBlank(ffRedDist.getState())) {
-			if(!ffRedDist.getState().equalsIgnoreCase("on")) {
+			if(ffRedDist.getState().equalsIgnoreCase("on") && testFailure.getState().equalsIgnoreCase("off")) {
 				 size = empList.size()+1;
 			}
 			
