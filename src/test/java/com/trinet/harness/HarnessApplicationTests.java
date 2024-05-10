@@ -33,7 +33,7 @@ class HarnessApplicationTests {
 	static List<Employee> employeeList;
 
 	@Autowired
-	FeatureFlagsService featureFlagsService;
+	HarnessProvider hrnProvider;
 
 	@Autowired
 	EmployeeService employeeService;
@@ -145,21 +145,16 @@ class HarnessApplicationTests {
 		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(true);
 		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
 		List<Employee> empList = employeeServiceInject.getEmployees();
-		FFRedisDto ffRedDist = new FFRedisDto();
-		FFRedisDto testFailure = new FFRedisDto();
-		try {
-			ffRedDist = featureFlagsService.getFlagById("test-variation");
-			testFailure = featureFlagsService.getFlagById("testFlag02");
-		} catch (JsonProcessingException e) {
+		boolean ffRedDist = false;
+		boolean testFailure = false;
+		ffRedDist = hrnProvider.getFlagValues("test-variation");
+		testFailure = hrnProvider.getFlagValues("testFlag02");
 
-		}
 		int size = empList.size();
-		if(ffRedDist!= null && StringUtils.isNotBlank(ffRedDist.getState())) {
-			if(ffRedDist.getState().equalsIgnoreCase("on") && testFailure.getState().equalsIgnoreCase("off")) {
-				 size = empList.size()+1;
-			}
-			
+		if (ffRedDist && !testFailure) {
+			size = empList.size() + 1;
 		}
+
 		int actualSize = employeeList.stream()
 				.filter(e -> e.getDepartment().equals(FeatureFlagConstants.SALES_DEPARTMENT)).toList().size();
 		;
