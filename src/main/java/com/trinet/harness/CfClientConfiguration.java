@@ -92,7 +92,6 @@ public class CfClientConfiguration {
 	}
 
 
-	@Bean
 	public void getFFValues() throws JsonProcessingException {
 		// fetch all feature flag values
 		String featureFlagString = HarnessUtils.getFeatureFlagValues();
