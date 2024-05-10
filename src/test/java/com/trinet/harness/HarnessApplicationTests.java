@@ -149,7 +149,7 @@ class HarnessApplicationTests {
 		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.SALES_DEPARTMENT_FLAG)).thenReturn(true);
 		when(harnessProvider.getFlagValuesFromCache(FeatureFlagConstants.EMPLOYEE_DISPLAY_API)).thenReturn(true);
 		List<Employee> empList = employeeServiceInject.getEmployees();
-		boolean ffRedDist = hrnProvider.getFlagValues("test-variation");
+		boolean ffRedDist = hrnProvider.getFlagValues("testvariation");
 		boolean testFailure = hrnProvider.getFlagValues("testFlag02");
 		logger.info("test-variation "+ffRedDist);
 		logger.info("testFlag02 "+testFailure);
