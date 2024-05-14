@@ -75,7 +75,7 @@ public class CfClientConfiguration {
 		cfClient = new CfClient(new HarnessConnector(apiKey, connectorConfig), options);
 		// CfClient cfClient = new CfClient(apiKey);
 		cfClient.waitForInitialization();
-		
+
 		cfClient.on(Event.READY, result -> logger.info("Harness client initialized."));
 		cfClient.on(Event.CHANGED, this::getSSEvents);
 		// Cache Data
@@ -99,27 +99,30 @@ public class CfClientConfiguration {
 
 	private void getSSEvents(String flag) {
 		logger.info("--->Triggering github actions workflow<---");
-		
+
 		gitHubActionsService.triggerGitHubActionWorkflow();
 	}
 
 	public void getFFValues() throws JsonProcessingException {
 		// fetch all feature flag values
-		String featureFlagString =getFeatureFlagValues();
+		String featureFlagString = getFeatureFlagValues();
 		JsonParser parser = new JsonParser();
 		// Creating JSONObject from String using parser
 		JsonObject featureFlagJson = parser.parse(featureFlagString).getAsJsonObject();
 		JsonArray featureFlags = featureFlagJson.getAsJsonArray("features");
-
-		// stale , status , name , identifier ,kind , project , env
 		List<FFRedisDto> ffList = new ArrayList<>();
 		FFRedisDto flag = new FFRedisDto();
-		for (JsonElement element : featureFlags) {
-			flag.setIdentifier(element.getAsJsonObject().get("identifier").getAsString());
-			flag.setState(element.getAsJsonObject().get("envProperties").getAsJsonObject().get("state").getAsString());
-			flag.setName(element.getAsJsonObject().get("name").getAsString());
-			ffList.add(flag);
-			flag = new FFRedisDto();
+		try {
+			for (JsonElement element : featureFlags) {
+				flag.setIdentifier(element.getAsJsonObject().get("identifier").getAsString());
+				flag.setState(
+						element.getAsJsonObject().get("envProperties").getAsJsonObject().get("state").getAsString());
+				flag.setName(element.getAsJsonObject().get("name").getAsString());
+				ffList.add(flag);
+				flag = new FFRedisDto();
+			}
+		} catch (Exception e) {
+			logger.info("Exception  " + e);
 		}
 
 		String flagsAsJsonString = objectMapper.writeValueAsString(ffList);
@@ -127,31 +130,27 @@ public class CfClientConfiguration {
 		logger.info("---->CACHE UPDATED<-----");
 		cacheDataRepository.save(cacheData);
 	}
-	
-	private  String getFeatureFlagValues() {
-        var httpClient = HttpClient.newBuilder().build();
 
-        logger.info("Updating redis from HarnessUtils");
-        HashMap<String, String> params = new HashMap<>();
-        params.put("accountIdentifier", FeatureFlagConstants.ACCOUNT_IDENTIFIER);
-        params.put("orgIdentifier", FeatureFlagConstants.ORG_IDENTIFIER);
-        params.put("projectIdentifier", FeatureFlagConstants.PROJECT_IDENTIFIER);
-        params.put("environmentIdentifier", FeatureFlagConstants.ENVIRONMENT_IDENTIFIER);
+	private String getFeatureFlagValues() {
+		var httpClient = HttpClient.newBuilder().build();
 
+		logger.info("Updating redis from HarnessUtils");
+		HashMap<String, String> params = new HashMap<>();
+		params.put("accountIdentifier", FeatureFlagConstants.ACCOUNT_IDENTIFIER);
+		params.put("orgIdentifier", FeatureFlagConstants.ORG_IDENTIFIER);
+		params.put("projectIdentifier", FeatureFlagConstants.PROJECT_IDENTIFIER);
+		params.put("environmentIdentifier", FeatureFlagConstants.ENVIRONMENT_IDENTIFIER);
 
-        var query = params.keySet().stream()
-          .map(key -> key + "=" + URLEncoder.encode(params.get(key), StandardCharsets.UTF_8))
-          .collect(Collectors.joining("&"));
+		var query = params.keySet().stream()
+				.map(key -> key + "=" + URLEncoder.encode(params.get(key), StandardCharsets.UTF_8))
+				.collect(Collectors.joining("&"));
 
-        var host = "https://app.harness.io";
-        var pathname = "/cf/admin/features";
-        var request = HttpRequest.newBuilder()
-          .GET()
-          .uri(URI.create(host + pathname + '?' + query))
-          .header("x-api-key", FeatureFlagConstants.DEV_X_API_KEY)
-          .build();
+		var host = "https://app.harness.io";
+		var pathname = "/cf/admin/features";
+		var request = HttpRequest.newBuilder().GET().uri(URI.create(host + pathname + '?' + query))
+				.header("x-api-key", FeatureFlagConstants.DEV_X_API_KEY).build();
 
-        HttpResponse<String> response;
+		HttpResponse<String> response;
 		try {
 			response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 		} catch (IOException e) {
@@ -161,8 +160,9 @@ public class CfClientConfiguration {
 			e.printStackTrace();
 			return "Exception Occurred".concat(e.getMessage());
 		}
+//		logger.info("Response from harness " + response.toString());
 
-        return response.body();
-      }
+		return response.body();
+	}
 
 }
