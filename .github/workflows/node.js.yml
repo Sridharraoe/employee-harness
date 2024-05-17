@@ -42,5 +42,5 @@ jobs:
       working-directory: ./employee-ui
     - run: npm run build --if-present
       working-directory: ./employee-ui
-    - run: npm test -- --configuration=ci
+    - run: npm test -- --watch=false --browsers=ChromeHeadless
       working-directory: ./employee-ui
